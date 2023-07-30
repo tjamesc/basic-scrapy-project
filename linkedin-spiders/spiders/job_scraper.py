@@ -31,3 +31,8 @@ class LinkedJobsSpider(scrapy.Spider):
             job_item['company_link'] = job.css('h4 a::attr(href)').get(default='not-found')
             job_item['company_location'] = job.css('.job-search-card__location::text').get(default='not-found').strip()
             yield job_item
+
+            if num_jobs_returned > 0:
+                first_job_on_page = int(first_job_on_page) + 25
+                next_url = self.api_url + str(first_job_on_page)
+                yield scrapy.Request(url=next_url, callback=self.parse_job, meta={'first_job_on_page': first_job_on_page})
